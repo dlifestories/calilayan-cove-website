@@ -1458,3 +1458,378 @@ body { overflow-x: hidden; }
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* V15: compact the complete website on desktop while preserving readable mobile behavior */
+:root {
+  --container: 900px;
+  --concept-bar-height: 28px;
+  --shadow: 0 10px 28px rgba(22, 24, 23, 0.11);
+}
+html {
+  scroll-padding-top: 72px;
+}
+body {
+  font-size: 14px;
+  line-height: 1.52;
+}
+.container {
+  width: min(calc(100% - 2rem), var(--container));
+}
+.section {
+  padding: clamp(2.5rem, 5vw, 4.25rem) 0;
+}
+.concept-bar {
+  min-height: var(--concept-bar-height);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.64rem;
+  line-height: 1.25;
+}
+.site-header {
+  top: var(--concept-bar-height);
+}
+.nav-shell {
+  min-height: 58px;
+  gap: 1.2rem;
+}
+.brand-logo {
+  width: 38px;
+  height: 38px;
+}
+.wordmark {
+  gap: 0.58rem;
+}
+.brand-copy > span {
+  font-size: clamp(0.88rem, 1.35vw, 1.02rem);
+  letter-spacing: 0.035em;
+}
+.wordmark small {
+  margin-top: 0.2rem;
+  font-size: 0.52rem;
+  letter-spacing: 0.13em;
+}
+.site-nav {
+  gap: 1rem;
+}
+.site-nav a {
+  font-size: 0.76rem;
+}
+.button {
+  min-height: 34px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.76rem;
+}
+.button-small {
+  min-height: 32px;
+  padding: 0.42rem 0.72rem;
+}
+.hero {
+  min-height: clamp(440px, 72svh, 580px);
+}
+.hero-content {
+  padding-top: 6rem;
+  padding-bottom: clamp(3rem, 7vh, 4.5rem);
+}
+.hero h1 {
+  max-width: 560px;
+  font-size: clamp(2.35rem, 5vw, 4.35rem);
+}
+.hero-copy {
+  max-width: 500px;
+  margin-top: 0.85rem;
+  font-size: clamp(0.85rem, 1.25vw, 1rem);
+}
+.hero-actions {
+  gap: 0.9rem;
+  margin-top: 1.3rem;
+}
+.hero-scroll {
+  bottom: 1rem;
+  font-size: 0.62rem;
+}
+.eyebrow {
+  margin-bottom: 0.6rem;
+  font-size: 0.64rem;
+}
+h2 {
+  font-size: clamp(1.7rem, 3.5vw, 3rem);
+}
+h3 {
+  font-size: 1.08rem;
+}
+.split,
+.experience-layout,
+.video-grid,
+.event-grid,
+.dining-grid,
+.booking-grid,
+.faq-grid,
+.contact-grid {
+  gap: clamp(1.4rem, 4vw, 3.5rem);
+}
+.intro-copy {
+  padding-top: 1rem;
+}
+.intro-copy > p {
+  font-size: 0.92rem;
+}
+.feature-row {
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+.feature-row span {
+  padding: 0.38rem 0.55rem;
+  font-size: 0.68rem;
+}
+.media-grid {
+  width: min(calc(100% - 2rem), 900px);
+  margin-inline: auto;
+  gap: 0.45rem;
+  padding-inline: 0;
+}
+.section-heading {
+  gap: 1.5rem;
+  margin-bottom: 1.8rem;
+}
+.card-grid {
+  gap: 0.75rem;
+}
+.card-body {
+  padding: 0.9rem;
+}
+.card-kicker {
+  font-size: 0.62rem;
+}
+.card-body p {
+  margin-block: 0.55rem;
+  font-size: 0.82rem;
+}
+.card-meta {
+  gap: 0.55rem;
+  padding-top: 0.65rem;
+  margin-top: 0.65rem;
+  font-size: 0.68rem;
+}
+.notice-box {
+  margin-top: 0.9rem;
+  padding: 0.85rem 1rem;
+}
+.experience-image {
+  max-height: 390px;
+}
+.experience-image img {
+  height: 100%;
+  object-fit: cover;
+}
+.experience-item {
+  grid-template-columns: 2rem 1fr auto;
+  gap: 0.65rem;
+  padding: 0.85rem 0;
+}
+.experience-item h3 {
+  font-size: clamp(1rem, 1.7vw, 1.3rem);
+}
+.experience-item p,
+.event-copy p,
+.dining-grid > div p:not(.eyebrow),
+.video-copy p:not(.eyebrow) {
+  font-size: 0.82rem;
+}
+.experience-status,
+.experience-number {
+  font-size: 0.64rem;
+}
+.video-frame {
+  max-width: 640px;
+}
+.event-gallery {
+  gap: 0.5rem;
+}
+.plain-list {
+  margin: 1rem 0;
+}
+.plain-list li {
+  padding: 0.52rem 0;
+  font-size: 0.82rem;
+}
+.dining-grid figure {
+  max-height: 360px;
+}
+.dining-grid img {
+  height: 100%;
+  object-fit: cover;
+}
+.gallery-section .section-heading.compact-heading {
+  width: min(100%, 660px);
+}
+.gallery-grid.gallery-grid--v13 {
+  width: min(calc(100% - 2rem), 620px) !important;
+  gap: 0.42rem !important;
+}
+.booking-intro {
+  top: 5rem;
+}
+.booking-points {
+  margin-top: 1.3rem;
+}
+.booking-points > div {
+  grid-template-columns: 1.7rem 1fr;
+  gap: 0.6rem;
+  padding: 0.65rem 0;
+}
+.booking-form {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+.form-header {
+  margin-bottom: 1rem;
+}
+.form-grid {
+  gap: 0.65rem;
+}
+label,
+legend,
+.form-header p,
+.estimate-panel span,
+.estimate-panel p,
+.form-footnote {
+  font-size: 0.68rem;
+}
+input,
+select,
+textarea {
+  margin-top: 0.3rem;
+  padding: 0.55rem 0.62rem;
+}
+fieldset.full-field,
+.estimate-panel {
+  padding: 0.7rem;
+}
+.estimate-panel,
+.checkbox-grid {
+  gap: 0.5rem;
+}
+summary {
+  padding: 0.8rem 1.5rem 0.8rem 0;
+  font-size: 0.82rem;
+}
+details p {
+  margin-bottom: 0.8rem;
+  font-size: 0.8rem;
+}
+.contact-copy {
+  padding-block: clamp(1rem, 3.5vw, 2.5rem);
+}
+.contact-hint {
+  margin-top: 0.75rem;
+  font-size: 0.74rem;
+}
+.contact-links .contact-link {
+  min-height: 84px;
+  padding: 0.75rem;
+  gap: 0.35rem 0.65rem;
+}
+.contact-links .contact-label {
+  font-size: 0.6rem;
+}
+.contact-links .contact-link strong {
+  font-size: 0.76rem;
+}
+.contact-arrow {
+  width: 1.45rem;
+  height: 1.45rem;
+  font-size: 0.82rem;
+}
+.site-footer {
+  padding: 2.25rem 0 1.2rem;
+}
+.footer-wordmark .brand-logo {
+  width: 44px;
+  height: 44px;
+}
+.footer-grid {
+  gap: 1.5rem;
+}
+.footer-grid p,
+.footer-links a {
+  font-size: 0.72rem;
+}
+.footer-bottom {
+  margin-top: 1.4rem;
+  padding-top: 0.8rem;
+  font-size: 0.66rem;
+}
+.js-scroll-top {
+  cursor: pointer;
+}
+
+@media (max-width: 980px) {
+  :root {
+    --container: 760px;
+    --concept-bar-height: 34px;
+  }
+  html {
+    scroll-padding-top: 72px;
+  }
+  .nav-shell {
+    min-height: 58px;
+  }
+  .site-nav {
+    max-height: calc(100svh - 72px);
+  }
+  .hero {
+    min-height: 520px;
+  }
+  .hero-content {
+    padding-top: 6rem;
+  }
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .experience-image {
+    max-height: 340px;
+  }
+}
+
+@media (max-width: 680px) {
+  :root {
+    --concept-bar-height: 44px;
+  }
+  body {
+    font-size: 14px;
+  }
+  .container {
+    width: min(calc(100% - 1.25rem), var(--container));
+  }
+  .section {
+    padding: 2.8rem 0;
+  }
+  .nav-shell {
+    min-height: 60px;
+  }
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+  }
+  .hero {
+    min-height: 540px;
+  }
+  .hero-content {
+    padding-top: 6.5rem;
+    padding-bottom: 3.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.35rem, 12vw, 3.45rem);
+  }
+  h2 {
+    font-size: clamp(1.8rem, 9vw, 2.7rem);
+  }
+  .media-grid {
+    width: min(calc(100% - 1rem), 520px);
+  }
+  .gallery-grid.gallery-grid--v13 {
+    width: min(calc(100% - 1rem), 420px) !important;
+  }
+  .contact-links .contact-link {
+    min-height: 78px;
+  }
+}

@@ -109,6 +109,30 @@
     link.addEventListener("blur", () => clearInteractionState());
   });
 
+
+  const scrollToPageTop = (event) => {
+    if (event) event.preventDefault();
+    closeMenu();
+
+    const reduceMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: reduceMotion ? "auto" : "smooth"
+    });
+
+    // Keep the address clean and make the fallback reliable in every browser.
+    if (window.location.hash === "#top") {
+      history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+    }
+  };
+
+  document.querySelectorAll(".js-scroll-top").forEach((link) => {
+    link.addEventListener("click", scrollToPageTop);
+  });
+
   if (video && "IntersectionObserver" in window) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
