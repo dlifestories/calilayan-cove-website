@@ -2534,3 +2534,110 @@ main figure::after {
   }
 }
 /* V19 HOVER ONLY END */
+
+/* V20 SIX IMAGE MEDIA START */
+/*
+  Converts the former three-image media strip into a clean,
+  equal-sized six-image grid.
+
+  Desktop: 3 columns × 2 rows
+  Tablet:  2 columns × 3 rows
+  Mobile:  1 column
+*/
+
+.media-band.media-band--six {
+  padding-block: clamp(3rem, 5vw, 4.8rem);
+  background: var(--white);
+}
+
+.media-band--six .media-grid--six {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  width: min(calc(100% - 2rem), 850px) !important;
+  min-height: 0 !important;
+  margin-inline: auto !important;
+  gap: 0.68rem !important;
+  align-items: stretch !important;
+}
+
+.media-band--six .media-grid--six .media-card {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  aspect-ratio: 4 / 3 !important;
+  overflow: hidden;
+  background: var(--gray-100);
+}
+
+/*
+  These declarations intentionally override the old uneven
+  portrait, wide, and square rules from the earlier layout.
+*/
+.media-band--six .media-grid--six .media-card:nth-child(n) {
+  grid-column: auto !important;
+  grid-row: auto !important;
+  aspect-ratio: 4 / 3 !important;
+}
+
+.media-band--six .media-grid--six .media-card img {
+  display: block;
+  width: 100%;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center;
+}
+
+/* Individual focal adjustments to avoid awkward cropping. */
+
+.media-band--six .media-card--beach6 img {
+  object-position: center 58%;
+}
+
+.media-band--six .media-card--beach8 img {
+  object-position: center 52%;
+}
+
+.media-band--six .media-card--beach3 img {
+  object-position: center 48%;
+}
+
+.media-band--six .media-card--beach5 img {
+  object-position: center 48%;
+}
+
+.media-band--six .media-card--beach9 img {
+  object-position: center 57%;
+}
+
+.media-band--six .media-card--beach10 img {
+  object-position: center 52%;
+}
+
+@media (max-width: 980px) {
+  .media-band--six .media-grid--six {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    width:
+      min(calc(100% - 2rem), 760px) !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .media-band.media-band--six {
+    padding-block: 2.8rem;
+  }
+
+  .media-band--six .media-grid--six {
+    grid-template-columns: 1fr !important;
+    width: min(calc(100% - 1.25rem), 520px) !important;
+    gap: 0.75rem !important;
+  }
+
+  .media-band--six .media-grid--six .media-card,
+  .media-band--six .media-grid--six .media-card:nth-child(n) {
+    aspect-ratio: 4 / 3 !important;
+  }
+}
+/* V20 SIX IMAGE MEDIA END */
