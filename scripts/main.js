@@ -81,12 +81,32 @@
   }
 
   document.querySelectorAll(".contact-link").forEach((link) => {
-    const clearPressedState = () => link.classList.remove("is-pressed");
-    link.addEventListener("pointerdown", () => link.classList.add("is-pressed"));
-    link.addEventListener("pointerup", clearPressedState);
-    link.addEventListener("pointercancel", clearPressedState);
-    link.addEventListener("pointerleave", clearPressedState);
-    link.addEventListener("blur", clearPressedState);
+    let longPressTimer = 0;
+    let releaseTimer = 0;
+
+    const clearInteractionState = (delay = 0) => {
+      window.clearTimeout(longPressTimer);
+      window.clearTimeout(releaseTimer);
+      releaseTimer = window.setTimeout(() => {
+        link.classList.remove("is-pressed", "is-long-pressed");
+      }, delay);
+    };
+
+    link.addEventListener("pointerdown", (event) => {
+      const bounds = link.getBoundingClientRect();
+      link.style.setProperty("--press-x", `${event.clientX - bounds.left}px`);
+      link.style.setProperty("--press-y", `${event.clientY - bounds.top}px`);
+      link.classList.add("is-pressed");
+      window.clearTimeout(longPressTimer);
+      longPressTimer = window.setTimeout(() => {
+        link.classList.add("is-long-pressed");
+      }, 360);
+    });
+
+    link.addEventListener("pointerup", () => clearInteractionState(220));
+    link.addEventListener("pointercancel", () => clearInteractionState());
+    link.addEventListener("pointerleave", () => clearInteractionState());
+    link.addEventListener("blur", () => clearInteractionState());
   });
 
   if (video && "IntersectionObserver" in window) {
