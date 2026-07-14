@@ -2719,3 +2719,36 @@ main figure::after {
   }
 }
 /* V23 MOBILE HAMBURGER ICON END */
+
+/* V26 REQUIRED FIELD VALIDATION START */
+.required-mark {
+  color: #b42318;
+  font-weight: 900;
+}
+
+.booking-form .field-invalid {
+  border-color: #b42318 !important;
+  background: #fff7f6;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.13);
+}
+
+.booking-form .field-invalid:focus {
+  border-color: #b42318 !important;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.2);
+}
+
+.booking-form .invalid-field-label {
+  color: #8f1d14;
+}
+
+.booking-form .consent-row.invalid-field-label {
+  padding: 0.75rem;
+  border: 1px solid #b42318;
+  background: #fff7f6;
+}
+
+.booking-form .form-message.is-error {
+  color: #b42318;
+  font-weight: 750;
+}
+/* V26 REQUIRED FIELD VALIDATION END */

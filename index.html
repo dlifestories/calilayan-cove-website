@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="assets/images/fav.png?v=4">
   <link rel="shortcut icon" type="image/png" href="assets/images/fav.png?v=4">
   <link rel="apple-touch-icon" href="assets/images/fav.png?v=4">
-  <link rel="stylesheet" href="styles/main.css?v=23">
+  <link rel="stylesheet" href="styles/main.css?v=26">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -257,19 +257,19 @@
         <form class="booking-form" id="booking-form" novalidate>
           <div class="form-header">
             <h3>Request details</h3>
-            <p>Fields marked with * are required.</p>
+            <p>Fields marked with <span class="required-mark" aria-hidden="true">*</span> are required.</p>
           </div>
           <div class="form-grid">
-            <label>Full name *
+            <label>Full name <span class="required-mark" aria-hidden="true">*</span>
               <input type="text" name="fullName" autocomplete="name" required>
             </label>
-            <label>Email address *
+            <label>Email address <span class="required-mark" aria-hidden="true">*</span>
               <input type="email" name="email" autocomplete="email" required>
             </label>
-            <label>Mobile number *
+            <label>Mobile number <span class="required-mark" aria-hidden="true">*</span>
               <input type="tel" name="mobile" autocomplete="tel" required>
             </label>
-            <label>Preferred contact channel *
+            <label>Preferred contact channel <span class="required-mark" aria-hidden="true">*</span>
               <select name="contactChannel" required>
                 <option value="">Select one</option>
                 <option>Email</option>
@@ -277,24 +277,24 @@
                 <option>Facebook Messenger</option>
               </select>
             </label>
-            <label>Check-in date *
+            <label>Check-in date <span class="required-mark" aria-hidden="true">*</span>
               <input type="date" name="checkIn" required>
             </label>
-            <label>Check-out date *
+            <label>Check-out date <span class="required-mark" aria-hidden="true">*</span>
               <input type="date" name="checkOut" required>
             </label>
-            <label>Adults *
+            <label>Adults <span class="required-mark" aria-hidden="true">*</span>
               <input type="number" name="adults" min="1" value="2" required>
             </label>
             <label>Children
               <input type="number" name="children" min="0" value="0">
             </label>
-            <label>Preferred accommodation *
+            <label>Preferred accommodation <span class="required-mark" aria-hidden="true">*</span>
               <select name="accommodation" id="accommodation-select" required>
                 <option value="">Select an accommodation</option>
               </select>
             </label>
-            <label>Number of rooms *
+            <label>Number of rooms <span class="required-mark" aria-hidden="true">*</span>
               <input type="number" name="numberOfRooms" min="1" value="1" required>
             </label>
             <fieldset class="full-field">
@@ -320,7 +320,7 @@
 
           <label class="consent-row">
             <input type="checkbox" name="consent" required>
-            <span>I understand that this is only a booking request, not a confirmed reservation, and I allow my submitted information to be stored in LinkTech’s private prototype booking records for this test. *</span>
+            <span>I understand that this is only a booking request, not a confirmed reservation, and I allow my submitted information to be stored in LinkTech’s private prototype booking records for this test. <span class="required-mark" aria-hidden="true">*</span></span>
           </label>
 
           <div class="form-message" id="form-message" role="alert"></div>
@@ -434,6 +434,6 @@
   <script src="scripts/config.js?v=24"></script>
   <script src="scripts/content.js"></script>
   <script src="scripts/main.js?v=19"></script>
-  <script src="scripts/booking.js?v=25"></script>
+  <script src="scripts/booking.js?v=26"></script>
 </body>
 </html>

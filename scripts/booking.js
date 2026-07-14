@@ -12,6 +12,7 @@
   const formMessage = document.getElementById("form-message");
   const submitButton = form?.querySelector('button[type="submit"]');
   const endpoint = String(config.appsScriptEndpoint || "").trim();
+  const requiredControls = form ? [...form.querySelectorAll("[required]")] : [];
 
   const state = {
     accommodations: [],
@@ -27,6 +28,48 @@
   };
   const isActive = (value) => value !== false && String(value).toLowerCase() !== "false" && String(value) !== "0";
   const firstDefined = (...values) => values.find((value) => value !== undefined && value !== null && value !== "");
+
+  const getValidationContainer = (control) => (
+    control?.closest(".consent-row") ||
+    control?.closest("label") ||
+    control?.parentElement ||
+    null
+  );
+
+  const syncControlValidity = (control) => {
+    if (!control) return true;
+    const invalid = !control.validity.valid;
+    control.classList.toggle("field-invalid", invalid);
+    control.setAttribute("aria-invalid", invalid ? "true" : "false");
+    getValidationContainer(control)?.classList.toggle("invalid-field-label", invalid);
+    return !invalid;
+  };
+
+  const syncRequiredValidity = () => {
+    let firstInvalid = null;
+    requiredControls.forEach((control) => {
+      const valid = syncControlValidity(control);
+      if (!valid && !firstInvalid) firstInvalid = control;
+    });
+    return firstInvalid;
+  };
+
+  const clearValidationMessageWhenComplete = () => {
+    if (!form?.classList.contains("validation-attempted")) return;
+    const firstInvalid = syncRequiredValidity();
+    if (!firstInvalid && formMessage?.dataset.validationMessage === "true") {
+      formMessage.textContent = "";
+      formMessage.classList.remove("is-error");
+      delete formMessage.dataset.validationMessage;
+    }
+  };
+
+  const showValidationMessage = (message) => {
+    if (!formMessage) return;
+    formMessage.textContent = message;
+    formMessage.classList.add("is-error");
+    formMessage.dataset.validationMessage = "true";
+  };
 
   const calculateNights = (checkIn, checkOut) => {
     if (!checkIn || !checkOut) return null;
@@ -319,11 +362,27 @@
     form.elements.checkIn.min = localToday;
     form.elements.checkOut.min = localToday;
 
+    requiredControls.forEach((control) => {
+      const refreshValidity = () => {
+        if (!form.classList.contains("validation-attempted")) return;
+        syncControlValidity(control);
+        clearValidationMessageWhenComplete();
+      };
+      control.addEventListener("input", refreshValidity);
+      control.addEventListener("change", refreshValidity);
+    });
+
     form.elements.checkIn.addEventListener("change", () => {
       form.elements.checkOut.min = form.elements.checkIn.value || localToday;
+      form.elements.checkOut.setCustomValidity("");
+      if (form.classList.contains("validation-attempted")) syncControlValidity(form.elements.checkOut);
       updateEstimate();
     });
-    form.elements.checkOut.addEventListener("change", updateEstimate);
+    form.elements.checkOut.addEventListener("change", () => {
+      form.elements.checkOut.setCustomValidity("");
+      if (form.classList.contains("validation-attempted")) syncControlValidity(form.elements.checkOut);
+      updateEstimate();
+    });
     form.elements.accommodation.addEventListener("change", updateEstimate);
     form.elements.numberOfRooms?.addEventListener("input", updateEstimate);
     form.elements.adults.addEventListener("input", updateEstimate);
@@ -339,14 +398,30 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (formMessage) formMessage.textContent = "";
-      if (!form.reportValidity()) return;
+      form.classList.add("validation-attempted");
+      form.elements.checkOut.setCustomValidity("");
+      if (formMessage) {
+        formMessage.textContent = "";
+        formMessage.classList.remove("is-error");
+        delete formMessage.dataset.validationMessage;
+      }
+
+      const firstInvalid = syncRequiredValidity();
+      if (firstInvalid || !form.checkValidity()) {
+        showValidationMessage("Please complete the required fields highlighted in red.");
+        form.reportValidity();
+        firstInvalid?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
 
       const data = new FormData(form);
       const nights = calculateNights(data.get("checkIn"), data.get("checkOut"));
       if (!nights) {
-        if (formMessage) formMessage.textContent = "Check-out must be later than check-in.";
-        form.elements.checkOut.focus();
+        form.elements.checkOut.setCustomValidity("Check-out must be later than check-in.");
+        syncControlValidity(form.elements.checkOut);
+        showValidationMessage("Check-out must be later than check-in.");
+        form.elements.checkOut.reportValidity();
+        form.elements.checkOut.scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
       if (!endpoint) {
@@ -456,6 +531,8 @@
           formMessage.textContent = message
             ? `Your request was not completed: ${message}`
             : "Your request was not completed. Please check your connection and try again.";
+          formMessage.classList.add("is-error");
+          delete formMessage.dataset.validationMessage;
         }
       } finally {
         form.removeAttribute("aria-busy");
