@@ -2666,3 +2666,15 @@ main figure::after {
   }
 }
 /* V21 MEDIA GRID SIZE TUNE END */
+
+/* V22 DESKTOP NORMAL-ZOOM SCALE START */
+/*
+  Makes the 100% desktop browser view match the approved 110% presentation.
+  Tablet and mobile layouts remain unchanged.
+*/
+@media (min-width: 981px) {
+  html {
+    zoom: 1.1;
+  }
+}
+/* V22 DESKTOP NORMAL-ZOOM SCALE END */
