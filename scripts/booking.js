@@ -103,6 +103,87 @@
     }
   };
 
+  const createRequestToken = () => {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID().replace(/-/g, "");
+    const random = Math.random().toString(36).slice(2);
+    return `${Date.now().toString(36)}${random}${Math.random().toString(36).slice(2)}`;
+  };
+
+  const isTrustedBridgeOrigin = (origin) => {
+    return origin === "https://script.google.com" || origin === "https://script.googleusercontent.com";
+  };
+
+  const submitThroughBridge = (payload) => new Promise((resolve, reject) => {
+    const requestToken = createRequestToken();
+    const frameName = `calilayan-booking-${requestToken}`;
+    const iframe = document.createElement("iframe");
+    const bridgeForm = document.createElement("form");
+    let settled = false;
+
+    const cleanup = () => {
+      window.removeEventListener("message", handleMessage);
+      window.clearTimeout(timeoutId);
+      bridgeForm.remove();
+      iframe.remove();
+    };
+
+    const finish = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      callback(value);
+    };
+
+    const handleMessage = (event) => {
+      if (event.source !== iframe.contentWindow || !isTrustedBridgeOrigin(event.origin)) return;
+      const message = event.data;
+      if (!message || message.source !== "calilayan-booking-bridge" || message.token !== requestToken) return;
+      finish(resolve, message.payload || {});
+    };
+
+    const timeoutId = window.setTimeout(() => {
+      finish(reject, new Error("The booking service did not respond in time. Please try again."));
+    }, 45000);
+
+    iframe.name = frameName;
+    iframe.title = "Booking service response";
+    iframe.hidden = true;
+    iframe.setAttribute("aria-hidden", "true");
+
+    bridgeForm.method = "POST";
+    bridgeForm.action = endpoint;
+    bridgeForm.target = frameName;
+    bridgeForm.enctype = "application/x-www-form-urlencoded";
+    bridgeForm.acceptCharset = "UTF-8";
+    bridgeForm.hidden = true;
+
+    const fields = {
+      payload: JSON.stringify(payload),
+      responseMode: "bridge",
+      requestOrigin: window.location.origin,
+      requestToken
+    };
+
+    Object.entries(fields).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      bridgeForm.append(input);
+    });
+
+    window.addEventListener("message", handleMessage);
+    document.body.append(iframe, bridgeForm);
+
+    window.requestAnimationFrame(() => {
+      try {
+        bridgeForm.submit();
+      } catch (_) {
+        finish(reject, new Error("The booking service could not be opened."));
+      }
+    });
+  });
+
   const renderAccommodations = () => {
     if (!accommodationSelect) return;
     const selectedValue = accommodationSelect.value;
@@ -322,16 +403,7 @@
       form.setAttribute("aria-busy", "true");
 
       try {
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload),
-          cache: "no-store",
-          credentials: "omit",
-          redirect: "follow"
-        });
-        if (!response.ok) throw new Error("The booking service could not be reached.");
-        const responsePayload = await parseResponse(response);
+        const responsePayload = await submitThroughBridge(payload);
         const result = resolveRoot(responsePayload);
         const succeeded = firstDefined(responsePayload.ok, responsePayload.success, result.ok, result.success, true);
         if (succeeded === false || String(succeeded).toLowerCase() === "false") {
