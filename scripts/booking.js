@@ -152,41 +152,33 @@
     return `${Date.now().toString(36)}${random}${Math.random().toString(36).slice(2)}`;
   };
 
-  const isTrustedBridgeOrigin = (origin) => {
-    return origin === "https://script.google.com" || origin === "https://script.googleusercontent.com";
+  const wait = (milliseconds) => new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+
+  const readSubmissionResult = async (requestToken) => {
+    const separator = endpoint.includes("?") ? "&" : "?";
+    const url = `${endpoint}${separator}action=result&requestToken=${encodeURIComponent(requestToken)}&_=${Date.now()}`;
+    const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      credentials: "omit",
+      redirect: "follow"
+    });
+
+    if (!response.ok) {
+      throw new Error("The booking result could not be checked.");
+    }
+
+    return parseResponse(response);
   };
 
-  const submitThroughBridge = (payload) => new Promise((resolve, reject) => {
+  // V28: the POST saves the booking, while reliable same-endpoint GET polling retrieves the result.
+  const submitThroughPolling = async (payload) => {
     const requestToken = createRequestToken();
     const frameName = `calilayan-booking-${requestToken}`;
     const iframe = document.createElement("iframe");
     const bridgeForm = document.createElement("form");
-    let settled = false;
-
-    const cleanup = () => {
-      window.removeEventListener("message", handleMessage);
-      window.clearTimeout(timeoutId);
-      bridgeForm.remove();
-      iframe.remove();
-    };
-
-    const finish = (callback, value) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      callback(value);
-    };
-
-    const handleMessage = (event) => {
-      if (event.source !== iframe.contentWindow || !isTrustedBridgeOrigin(event.origin)) return;
-      const message = event.data;
-      if (!message || message.source !== "calilayan-booking-bridge" || message.token !== requestToken) return;
-      finish(resolve, message.payload || {});
-    };
-
-    const timeoutId = window.setTimeout(() => {
-      finish(reject, new Error("The booking service did not respond in time. Please try again."));
-    }, 45000);
 
     iframe.name = frameName;
     iframe.title = "Booking service response";
@@ -202,7 +194,7 @@
 
     const fields = {
       payload: JSON.stringify(payload),
-      responseMode: "bridge",
+      responseMode: "poll",
       requestOrigin: window.location.origin,
       requestToken
     };
@@ -215,17 +207,69 @@
       bridgeForm.append(input);
     });
 
-    window.addEventListener("message", handleMessage);
     document.body.append(iframe, bridgeForm);
 
-    window.requestAnimationFrame(() => {
-      try {
-        bridgeForm.submit();
-      } catch (_) {
-        finish(reject, new Error("The booking service could not be opened."));
+    try {
+      bridgeForm.submit();
+
+      const deadline = Date.now() + 45000;
+      let lastNetworkError = null;
+
+      while (Date.now() < deadline) {
+        await wait(800);
+
+        let statusPayload;
+
+        try {
+          statusPayload = await readSubmissionResult(requestToken);
+        } catch (error) {
+          lastNetworkError = error;
+          continue;
+        }
+
+        const pending = Boolean(firstDefined(
+          statusPayload.pending,
+          statusPayload.data?.pending,
+          false
+        ));
+
+        if (pending) {
+          continue;
+        }
+
+        const completedResult = firstDefined(
+          statusPayload.result,
+          statusPayload.payload,
+          statusPayload.data?.result,
+          statusPayload.data?.payload
+        );
+
+        if (completedResult !== undefined) {
+          return completedResult;
+        }
+
+        if (statusPayload.ok === false) {
+          throw new Error(
+            cleanText(firstDefined(statusPayload.error, statusPayload.message)) ||
+            "The booking service returned an error."
+          );
+        }
       }
-    });
-  });
+
+      if (lastNetworkError) {
+        throw new Error(
+          "The booking was sent, but its confirmation could not be retrieved. Check BOOKING REQUESTS before trying again."
+        );
+      }
+
+      throw new Error(
+        "The booking was sent, but confirmation took too long. Check BOOKING REQUESTS before trying again."
+      );
+    } finally {
+      bridgeForm.remove();
+      iframe.remove();
+    }
+  };
 
   const renderAccommodations = () => {
     if (!accommodationSelect) return;
@@ -478,7 +522,7 @@
       form.setAttribute("aria-busy", "true");
 
       try {
-        const responsePayload = await submitThroughBridge(payload);
+        const responsePayload = await submitThroughPolling(payload);
         const result = resolveRoot(responsePayload);
         const succeeded = firstDefined(responsePayload.ok, responsePayload.success, result.ok, result.success, true);
         if (succeeded === false || String(succeeded).toLowerCase() === "false") {
